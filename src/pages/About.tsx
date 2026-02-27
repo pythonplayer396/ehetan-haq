@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Code, Megaphone, Bot, Server } from "lucide-react";
+import profileImg from "@/assets/profile.jpg";
 import { Badge } from "@/components/ui/badge";
 import KnowledgeGraph from "@/components/KnowledgeGraph";
 
@@ -56,11 +57,26 @@ const About = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="max-w-3xl"
+          className="flex flex-col items-start gap-8 md:flex-row md:items-center"
         >
-          <p className="mb-3 font-mono text-sm text-primary">About Me</p>
-          <h1 className="mb-2 text-4xl font-extrabold text-foreground md:text-5xl">Ethan Haq</h1>
-          <p className="mb-6 text-lg text-muted-foreground">Full-Stack Developer & Bot Specialist</p>
+          <div className="relative shrink-0">
+            <div className="h-32 w-32 overflow-hidden rounded-full border-2 border-primary/30 shadow-xl md:h-40 md:w-40">
+              <img src={profileImg} alt="Ethan Haq" className="h-full w-full object-cover" />
+            </div>
+            <div className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full border-2 border-background bg-emerald-500" />
+          </div>
+          <div>
+            <p className="mb-3 font-mono text-sm text-primary">About Me</p>
+            <h1 className="mb-2 text-4xl font-extrabold text-foreground md:text-5xl">Ethan Haq</h1>
+            <p className="mb-0 text-lg text-muted-foreground">Full-Stack Developer & Bot Specialist</p>
+          </div>
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.15 }}
+          className="mt-8 max-w-3xl"
+        >
           <div className="space-y-4 text-base leading-relaxed text-muted-foreground">
             <p>
               I'm a passionate <strong className="text-foreground">full-stack developer</strong> with deep expertise in building
