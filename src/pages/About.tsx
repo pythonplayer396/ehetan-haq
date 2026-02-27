@@ -1,29 +1,82 @@
-import { motion } from "framer-motion";
-import { Code, Megaphone, Bot, Server } from "lucide-react";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Code, Megaphone, Bot, Server, ChevronUp } from "lucide-react";
 import profileImg from "@/assets/profile.jpg";
-import { Badge } from "@/components/ui/badge";
 import KnowledgeGraph from "@/components/KnowledgeGraph";
+import { cn } from "@/lib/utils";
 
-const skills = [
-  { name: "JavaScript", level: "Expert" },
-  { name: "Python", level: "Expert" },
-  { name: "Node.js", level: "Expert" },
-  { name: "React", level: "Advanced" },
-  { name: "Tailwind CSS", level: "Advanced" },
-  { name: "Discord.js", level: "Expert" },
-  { name: "Express.js", level: "Advanced" },
-  { name: "Bash/Linux", level: "Advanced" },
-  { name: "TypeScript", level: "Intermediate" },
-  { name: "HTML/CSS", level: "Expert" },
-  { name: "Ubuntu/VPS", level: "Advanced" },
-  { name: "npm", level: "Expert" },
+interface SkillItem {
+  name: string;
+  percent: number;
+  color: string;
+}
+
+interface SkillCategory {
+  title: string;
+  color: string;
+  skills: SkillItem[];
+}
+
+const skillCategories: SkillCategory[] = [
+  {
+    title: "Frontend",
+    color: "hsl(262, 83%, 58%)",
+    skills: [
+      { name: "React", percent: 88, color: "hsl(262, 83%, 58%)" },
+      { name: "Tailwind CSS", percent: 90, color: "hsl(262, 83%, 58%)" },
+      { name: "HTML / CSS", percent: 95, color: "hsl(262, 83%, 58%)" },
+      { name: "Responsive UI/UX", percent: 85, color: "hsl(262, 83%, 58%)" },
+      { name: "Animations & Motion", percent: 78, color: "hsl(262, 83%, 58%)" },
+    ],
+  },
+  {
+    title: "Backend & Databases",
+    color: "hsl(142, 71%, 45%)",
+    skills: [
+      { name: "Node.js", percent: 92, color: "hsl(142, 71%, 45%)" },
+      { name: "Express.js", percent: 88, color: "hsl(142, 71%, 45%)" },
+      { name: "Python", percent: 85, color: "hsl(142, 71%, 45%)" },
+      { name: "MongoDB", percent: 75, color: "hsl(142, 71%, 45%)" },
+      { name: "REST APIs", percent: 90, color: "hsl(142, 71%, 45%)" },
+      { name: "TypeScript", percent: 72, color: "hsl(142, 71%, 45%)" },
+    ],
+  },
+  {
+    title: "Bots & Automation",
+    color: "hsl(346, 77%, 50%)",
+    skills: [
+      { name: "Discord.js", percent: 95, color: "hsl(346, 77%, 50%)" },
+      { name: "Discord Bots", percent: 93, color: "hsl(346, 77%, 50%)" },
+      { name: "Telegram Bots", percent: 80, color: "hsl(346, 77%, 50%)" },
+      { name: "AI Chatbot Integration", percent: 78, color: "hsl(346, 77%, 50%)" },
+      { name: "Moderation Systems", percent: 88, color: "hsl(346, 77%, 50%)" },
+      { name: "Webhooks & Automation", percent: 85, color: "hsl(346, 77%, 50%)" },
+    ],
+  },
+  {
+    title: "Cybersecurity & Tools",
+    color: "hsl(38, 92%, 50%)",
+    skills: [
+      { name: "Linux / VPS Administration", percent: 88, color: "hsl(38, 92%, 50%)" },
+      { name: "Bash / Shell Scripting", percent: 85, color: "hsl(38, 92%, 50%)" },
+      { name: "SSH & Server Management", percent: 87, color: "hsl(38, 92%, 50%)" },
+      { name: "Security & Pen Testing", percent: 75, color: "hsl(38, 92%, 50%)" },
+      { name: "OSINT / Reconnaissance", percent: 72, color: "hsl(38, 92%, 50%)" },
+      { name: "npm & Package Management", percent: 90, color: "hsl(38, 92%, 50%)" },
+    ],
+  },
+  {
+    title: "Soft Skills",
+    color: "hsl(188, 78%, 41%)",
+    skills: [
+      { name: "Attention to Detail", percent: 92, color: "hsl(188, 78%, 41%)" },
+      { name: "Fast Learner", percent: 95, color: "hsl(188, 78%, 41%)" },
+      { name: "Strong Communication", percent: 85, color: "hsl(188, 78%, 41%)" },
+      { name: "Team Collaboration", percent: 88, color: "hsl(188, 78%, 41%)" },
+      { name: "Problem Solving", percent: 93, color: "hsl(188, 78%, 41%)" },
+    ],
+  },
 ];
-
-const levelColor: Record<string, string> = {
-  Expert: "bg-primary/15 text-primary border-primary/20",
-  Advanced: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
-  Intermediate: "bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/20",
-};
 
 const services = [
   {
@@ -47,6 +100,71 @@ const services = [
     desc: "Server setup, database design, RESTful API development, VPS/Linux administration, and TypeScript backend services. Secure and performant infrastructure.",
   },
 ];
+
+const SkillDropdown = ({ category, defaultOpen = false }: { category: SkillCategory; defaultOpen?: boolean }) => {
+  const [open, setOpen] = useState(defaultOpen);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 15 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      className="rounded-xl border border-border/50 bg-card overflow-hidden"
+    >
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex w-full items-center justify-between px-5 py-4 text-left transition-colors hover:bg-secondary/30"
+      >
+        <div className="flex items-center gap-3">
+          <h3 className="text-lg font-bold" style={{ color: category.color }}>
+            {category.title}
+          </h3>
+          <span className="text-xs text-muted-foreground">
+            [{category.skills.length} modules]
+          </span>
+        </div>
+        <ChevronUp
+          className={cn(
+            "h-5 w-5 text-muted-foreground transition-transform duration-300",
+            !open && "rotate-180"
+          )}
+        />
+      </button>
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="overflow-hidden"
+          >
+            <div className="space-y-4 px-5 pb-5">
+              {category.skills.map((skill, i) => (
+                <div key={skill.name}>
+                  <div className="mb-1.5 flex items-center justify-between">
+                    <span className="text-sm text-foreground">{skill.name}</span>
+                    <span className="font-mono text-xs text-muted-foreground">{skill.percent}%</span>
+                  </div>
+                  <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      whileInView={{ width: `${skill.percent}%` }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 1, delay: i * 0.1, ease: "easeOut" }}
+                      className="h-full rounded-full"
+                      style={{ backgroundColor: skill.color }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+};
 
 const About = () => {
   return (
@@ -98,26 +216,14 @@ const About = () => {
         </motion.div>
       </section>
 
-      {/* Skills Grid */}
+      {/* Skills - Collapsible Categories */}
       <section className="border-t border-border/50 py-20">
         <div className="container mx-auto px-6">
           <p className="mb-3 font-mono text-sm text-primary">Expertise</p>
-          <p className="mb-10 text-3xl font-bold text-foreground">Skills & Tools</p>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-            {skills.map((skill, i) => (
-              <motion.div
-                key={skill.name}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.05 }}
-                className="flex items-center justify-between rounded-xl border border-border/50 bg-card px-4 py-3"
-              >
-                <span className="text-sm font-medium text-foreground">{skill.name}</span>
-                <Badge variant="outline" className={`text-[10px] ${levelColor[skill.level]}`}>
-                  {skill.level}
-                </Badge>
-              </motion.div>
+          <p className="mb-10 text-3xl font-bold text-foreground">Skills & Proficiency</p>
+          <div className="space-y-4">
+            {skillCategories.map((cat, catIdx) => (
+              <SkillDropdown key={cat.title} category={cat} defaultOpen={catIdx === 0} />
             ))}
           </div>
         </div>
