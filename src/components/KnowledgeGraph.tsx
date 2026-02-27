@@ -299,6 +299,27 @@ const KnowledgeGraph = () => {
         n.vx += (cx - n.x) * 0.0005;
         n.vy += (cy - n.y) * 0.0005;
 
+        // Orbital rotation force — tangential push around center
+        const dx_c = n.x - cx;
+        const dy_c = n.y - cy;
+        const dist_c = Math.sqrt(dx_c * dx_c + dy_c * dy_c) || 1;
+        // Tangent vector (perpendicular to radius)
+        const tx = -dy_c / dist_c;
+        const ty = dx_c / dist_c;
+        // Speed varies by group for visual variety
+        const groupSpeeds: Record<string, number> = {
+          core: 0.02, frontend: 0.08, backend: -0.06,
+          bots: 0.07, tools: -0.05, services: 0.04,
+        };
+        const orbitSpeed = groupSpeeds[n.group] || 0.05;
+        n.vx += tx * orbitSpeed;
+        n.vy += ty * orbitSpeed;
+
+        // Gentle floating wobble
+        const wobble = Math.sin(Date.now() * 0.001 + i * 1.7) * 0.03;
+        n.vx += wobble;
+        n.vy += Math.cos(Date.now() * 0.0012 + i * 2.3) * 0.03;
+
         // Repulsion
         for (let j = i + 1; j < nodes.length; j++) {
           const m = nodes[j];
