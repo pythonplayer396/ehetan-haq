@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Code, Megaphone, Bot, Server } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import OrbitSystem from "@/components/OrbitSystem";
+import KnowledgeGraph from "@/components/KnowledgeGraph";
 
 const skills = [
   { name: "JavaScript", level: "Expert" },
@@ -114,10 +114,10 @@ const About = () => {
             <p className="mb-3 font-mono text-sm text-primary">System Architecture</p>
             <p className="mb-4 text-3xl font-bold text-foreground">How Modern Web Systems Connect</p>
             <p className="mx-auto mb-12 max-w-lg text-sm text-muted-foreground">
-              A visual representation of the full-stack ecosystem — from frontend interfaces to backend services, databases, APIs, and intelligent bots — all orbiting around a unified system core.
+              An interactive knowledge graph showing how technologies, services, and tools interconnect across the full-stack ecosystem. Click any node to explore its connections.
             </p>
           </div>
-          <OrbitSystem />
+          <KnowledgeGraph />
         </div>
       </section>
 
