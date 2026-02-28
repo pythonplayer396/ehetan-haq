@@ -24,7 +24,7 @@ const ParticleBackground = () => {
 
     const resize = () => {
       canvas.width = window.innerWidth;
-      canvas.height = document.documentElement.scrollHeight;
+      canvas.height = window.innerHeight;
     };
 
     const createParticles = () => {
@@ -49,7 +49,7 @@ const ParticleBackground = () => {
     };
 
     const handleMouseMove = (e: MouseEvent) => {
-      mouseRef.current = { x: e.clientX, y: e.clientY + window.scrollY };
+      mouseRef.current = { x: e.clientX, y: e.clientY };
     };
 
     const handleMouseLeave = () => {
@@ -124,16 +124,13 @@ const ParticleBackground = () => {
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("mouseleave", handleMouseLeave);
 
-    // Observe body height changes to resize canvas
-    const resizeObserver = new ResizeObserver(resize);
-    resizeObserver.observe(document.body);
+    // No body observer needed for fixed canvas
 
     return () => {
       cancelAnimationFrame(rafRef.current);
       window.removeEventListener("resize", handleResize);
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseleave", handleMouseLeave);
-      resizeObserver.disconnect();
     };
   }, []);
 
