@@ -40,6 +40,7 @@ const Index = () => {
   const [projects, setProjects] = useState<any[]>([]);
   const [skills, setSkills] = useState<any[]>([]);
   const [certificates, setCertificates] = useState<any[]>([]);
+  const [lightboxImg, setLightboxImg] = useState<string | null>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -176,7 +177,7 @@ const Index = () => {
                     viewport={{ once: true }}
                     transition={{ delay: i * 0.1, duration: 0.6 }}
                   >
-                    <div className="group rounded-xl border border-border/50 bg-card/80 backdrop-blur-sm overflow-hidden transition-all hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 h-full flex flex-col">
+                    <div className="group rounded-xl border border-border/50 bg-card/80 backdrop-blur-sm overflow-hidden transition-all hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 h-full flex flex-col cursor-pointer" onClick={() => cert.image_url && setLightboxImg(cert.image_url)}>
                       {cert.image_url ? (
                         <div className="relative aspect-[16/10] overflow-hidden">
                           <img
@@ -243,6 +244,25 @@ const Index = () => {
           </div>
         </ScrollReveal>
       </section>
+      {/* Lightbox */}
+      {lightboxImg && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm cursor-pointer p-6"
+          onClick={() => setLightboxImg(null)}
+        >
+          <motion.img
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.3 }}
+            src={lightboxImg}
+            alt="Certificate"
+            className="max-h-[85vh] max-w-[90vw] rounded-xl object-contain shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </motion.div>
+      )}
     </div>
   );
 };
