@@ -168,7 +168,7 @@ const SkillDropdown = ({ category, defaultOpen = false }: { category: SkillCateg
 
 const About = () => {
   return (
-    <div className="pt-[var(--nav-height)]">
+    <div className="relative z-10 pt-[var(--nav-height)]">
       {/* Profile */}
       <section className="container mx-auto px-6 py-24">
         <motion.div

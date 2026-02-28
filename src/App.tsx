@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import ParticleBackground from "@/components/ParticleBackground";
 import Index from "./pages/Index";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
@@ -20,6 +21,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <ParticleBackground />
           <Navbar />
           <main className="min-h-screen">
             <Routes>
