@@ -1,7 +1,11 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Code, Megaphone, Bot, Server, ChevronUp } from "lucide-react";
+import { ChevronUp } from "lucide-react";
 import profileImg from "@/assets/profile.jpg";
+import iconWebdev from "@/assets/icon-webdev.jpg";
+import iconMarketing from "@/assets/icon-marketing.jpg";
+import iconBots from "@/assets/icon-bots.jpg";
+import iconBackend from "@/assets/icon-backend.gif";
 import KnowledgeGraph from "@/components/KnowledgeGraph";
 import { cn } from "@/lib/utils";
 
@@ -80,22 +84,22 @@ const skillCategories: SkillCategory[] = [
 
 const services = [
   {
-    icon: Code,
+    image: iconWebdev,
     title: "Web Development",
     desc: "Full-stack web applications, responsive sites, and modern UIs built with React, Tailwind, and Node.js. From landing pages to complex dashboards.",
   },
   {
-    icon: Megaphone,
+    image: iconMarketing,
     title: "Marketing & Team Management",
     desc: "Digital marketing strategy, ad campaign management, and social media presence across Facebook, Instagram, and other platforms. Team coordination and growth hacking.",
   },
   {
-    icon: Bot,
+    image: iconBots,
     title: "Discord & Telegram Bots",
     desc: "Custom automation bots, moderation systems, interactive community features, and AI-powered chatbots. Built for scale and reliability.",
   },
   {
-    icon: Server,
+    image: iconBackend,
     title: "Backend Management",
     desc: "Server setup, database design, RESTful API development, VPS/Linux administration, and TypeScript backend services. Secure and performant infrastructure.",
   },
@@ -258,8 +262,8 @@ const About = () => {
                 transition={{ delay: i * 0.1 }}
                 className="rounded-xl border border-border/50 bg-card p-6 transition-all hover:border-primary/30 hover:shadow-lg"
               >
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                  <service.icon className="h-6 w-6 text-primary" />
+                <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-lg bg-primary/10 overflow-hidden">
+                  <img src={service.image} alt={service.title} className="h-10 w-10 object-contain" />
                 </div>
                 <h3 className="mb-2 text-lg font-bold text-foreground">{service.title}</h3>
                 <p className="text-sm leading-relaxed text-muted-foreground">{service.desc}</p>
