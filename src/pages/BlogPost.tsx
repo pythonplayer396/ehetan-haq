@@ -28,7 +28,7 @@ const BlogPost = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetch = async () => {
+    const fetchPost = async () => {
       if (!slug) return;
       const { data } = await supabase
         .from("blog_posts")
@@ -47,7 +47,7 @@ const BlogPost = () => {
       }
       setLoading(false);
     };
-    fetch();
+    fetchPost();
   }, [slug]);
 
   if (loading) {
@@ -69,62 +69,109 @@ const BlogPost = () => {
     );
   }
 
+  const publishDate = new Date(post.published_at || post.created_at).toLocaleDateString("en-US", {
+    month: "long", day: "numeric", year: "numeric",
+  });
+
   return (
-    <div className="relative z-10 pt-[var(--nav-height)]">
-      <article className="container mx-auto max-w-3xl px-6 py-16">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <Button asChild variant="ghost" size="sm" className="mb-8">
-            <Link to="/blog"><ArrowLeft className="mr-2 h-4 w-4" /> Back to Blog</Link>
-          </Button>
-
-          {(post.blog_categories as any) && (
-            <Badge variant="secondary" className="mb-4">{(post.blog_categories as any).name}</Badge>
-          )}
-
-          <h1 className="mb-4 text-4xl font-extrabold leading-tight text-foreground md:text-5xl">
-            {post.title}
-          </h1>
-
-          <div className="mb-8 flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-            <span className="flex items-center gap-1">
-              <Calendar className="h-4 w-4" />
-              {new Date(post.published_at || post.created_at).toLocaleDateString("en-US", {
-                month: "long",
-                day: "numeric",
-                year: "numeric",
-              })}
-            </span>
-            {post.reading_time_minutes && (
-              <span className="flex items-center gap-1">
-                <Clock className="h-4 w-4" />
-                {post.reading_time_minutes} min read
-              </span>
-            )}
-          </div>
-
-          {post.cover_image && (
-            <div className="mb-10 overflow-hidden rounded-xl">
-              <img src={post.cover_image} alt={post.title} className="w-full object-cover" />
-            </div>
-          )}
-        </motion.div>
-
+    <div className="relative z-10 min-h-screen bg-background pt-[var(--nav-height)]">
+      {/* Full-bleed cover image hero */}
+      {post.cover_image && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className="prose prose-lg dark:prose-invert max-w-none prose-headings:text-foreground prose-p:text-muted-foreground prose-a:text-primary prose-strong:text-foreground prose-code:rounded prose-code:bg-secondary prose-code:px-1.5 prose-code:py-0.5 prose-code:text-sm prose-pre:bg-secondary prose-pre:border prose-pre:border-border"
+          transition={{ duration: 0.8 }}
+          className="relative w-full"
         >
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.content}</ReactMarkdown>
-        </motion.div>
-
-        {tags.length > 0 && (
-          <div className="mt-10 flex flex-wrap gap-2 border-t border-border/50 pt-6">
-            {tags.map((tag) => (
-              <Badge key={tag} variant="outline" className="text-xs">#{tag}</Badge>
-            ))}
+          <div className="aspect-[21/9] max-h-[70vh] w-full overflow-hidden">
+            <img
+              src={post.cover_image}
+              alt={post.title}
+              className="h-full w-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
           </div>
-        )}
+        </motion.div>
+      )}
+
+      <article className="relative">
+        {/* Title section */}
+        <div className="container mx-auto max-w-4xl px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className={post.cover_image ? "-mt-32 relative z-10" : "pt-16"}
+          >
+            <Link
+              to="/blog"
+              className="mb-8 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ArrowLeft className="h-4 w-4" /> Back to Journal
+            </Link>
+
+            <div className="flex items-center gap-3 mb-6">
+              {(post.blog_categories as any) && (
+                <span className="rounded-full bg-primary px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary-foreground">
+                  {(post.blog_categories as any).name}
+                </span>
+              )}
+            </div>
+
+            <h1 className="mb-6 text-4xl font-extrabold leading-[1.08] tracking-tight text-foreground md:text-6xl lg:text-7xl">
+              {post.title}
+            </h1>
+
+            {post.excerpt && (
+              <p className="mb-8 max-w-2xl text-lg text-muted-foreground md:text-xl">{post.excerpt}</p>
+            )}
+
+            <div className="flex items-center gap-6 text-sm text-muted-foreground border-b border-border/50 pb-8 mb-12">
+              <span className="flex items-center gap-1.5">
+                <Calendar className="h-4 w-4" />
+                {publishDate}
+              </span>
+              {post.reading_time_minutes && (
+                <span className="flex items-center gap-1.5">
+                  <Clock className="h-4 w-4" />
+                  {post.reading_time_minutes} min read
+                </span>
+              )}
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Content */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4, duration: 0.6 }}
+          className="container mx-auto max-w-3xl px-6 pb-20"
+        >
+          <div className="prose prose-lg dark:prose-invert max-w-none prose-headings:font-extrabold prose-headings:tracking-tight prose-headings:text-foreground prose-p:text-muted-foreground prose-p:leading-relaxed prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-strong:text-foreground prose-code:rounded prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:text-sm prose-code:before:content-none prose-code:after:content-none prose-pre:bg-muted prose-pre:border prose-pre:border-border prose-blockquote:border-l-primary prose-blockquote:text-muted-foreground prose-img:rounded-xl">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.content}</ReactMarkdown>
+          </div>
+
+          {tags.length > 0 && (
+            <div className="mt-16 flex flex-wrap gap-2 border-t border-border/50 pt-8">
+              {tags.map((tag) => (
+                <Badge key={tag} variant="outline" className="rounded-full px-4 py-1.5 text-xs uppercase tracking-wider">
+                  #{tag}
+                </Badge>
+              ))}
+            </div>
+          )}
+
+          {/* Back link */}
+          <div className="mt-16 pt-8 border-t border-border/50">
+            <Link
+              to="/blog"
+              className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+            >
+              <ArrowLeft className="h-4 w-4" /> Back to all articles
+            </Link>
+          </div>
+        </motion.div>
       </article>
     </div>
   );
