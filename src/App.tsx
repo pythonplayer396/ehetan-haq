@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { AuthProvider } from "@/hooks/useAuth";
 import { usePageTracking } from "@/hooks/usePageTracking";
+import { ScrollToTop } from "@/components/ScrollToTop";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ParticleBackground from "@/components/ParticleBackground";
@@ -36,6 +37,7 @@ const AppContent = () => {
 
   return (
     <>
+      <ScrollToTop />
       {!isAdmin && <ParticleBackground />}
       {!isAdmin && <Navbar />}
       <main className={isAdmin ? "" : "min-h-screen"}>
