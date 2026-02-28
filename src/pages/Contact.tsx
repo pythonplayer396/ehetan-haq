@@ -1,5 +1,12 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { Mail } from "lucide-react";
+import { Send, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 
 const DiscordIcon = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 127.14 96.36" fill="currentColor">
@@ -24,89 +31,114 @@ const GmailIcon = ({ className }: { className?: string }) => (
 );
 
 const contacts = [
-  {
-    icon: GmailIcon,
-    label: "Email",
-    tag: "Preferred",
-    value: "roshw0023@gmail.com",
-    href: "mailto:roshw0023@gmail.com",
-    gradient: "from-red-500 to-orange-500",
-  },
-  {
-    icon: DiscordIcon,
-    label: "Discord",
-    tag: "Fastest",
-    value: "ehtan_haq",
-    href: undefined,
-    gradient: "from-indigo-500 to-purple-500",
-  },
-  {
-    icon: TelegramIcon,
-    label: "Telegram",
-    tag: "Secure",
-    value: "C0deBr34ker1",
-    href: "https://t.me/C0deBr34ker1",
-    gradient: "from-sky-400 to-blue-500",
-  },
+  { icon: GmailIcon, label: "Email", tag: "Preferred", value: "roshw0023@gmail.com", href: "mailto:roshw0023@gmail.com", gradient: "from-red-500 to-orange-500" },
+  { icon: DiscordIcon, label: "Discord", tag: "Fastest", value: "ehtan_haq", href: undefined, gradient: "from-indigo-500 to-purple-500" },
+  { icon: TelegramIcon, label: "Telegram", tag: "Secure", value: "C0deBr34ker1", href: "https://t.me/C0deBr34ker1", gradient: "from-sky-400 to-blue-500" },
 ];
 
 const Contact = () => {
+  const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.name.trim() || !form.email.trim() || !form.message.trim()) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
+    setLoading(true);
+    const { error } = await supabase.from("contact_messages").insert({
+      name: form.name.trim(),
+      email: form.email.trim(),
+      subject: form.subject.trim() || null,
+      message: form.message.trim(),
+    });
+    setLoading(false);
+
+    if (error) {
+      toast.error("Failed to send message. Please try again.");
+      return;
+    }
+    toast.success("Message sent! I'll get back to you soon.");
+    setForm({ name: "", email: "", subject: "", message: "" });
+  };
+
   return (
     <div className="pt-[var(--nav-height)]">
       <section className="container mx-auto px-6 py-24">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="max-w-3xl"
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="max-w-3xl">
           <p className="mb-3 font-mono text-sm text-primary">Get In Touch</p>
           <h1 className="mb-4 text-4xl font-extrabold text-foreground md:text-5xl">Contact Me</h1>
           <p className="mb-12 text-lg text-muted-foreground">
-            Have a project in mind or just want to connect? Feel free to reach out through any of the channels below. I'm always open to discussing new ideas.
+            Have a project in mind or just want to connect? Send me a message or reach out through any channel below.
           </p>
         </motion.div>
 
-        <div className="grid gap-6 sm:grid-cols-3">
-          {contacts.map((contact, i) => {
-            const Wrapper = contact.href ? "a" : "div";
-            const wrapperProps = contact.href
-              ? { href: contact.href, target: "_blank", rel: "noopener noreferrer" }
-              : {};
+        <div className="grid gap-12 lg:grid-cols-2">
+          {/* Contact Form */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.5 }}>
+            <h2 className="mb-6 text-xl font-bold text-foreground">Send a Message</h2>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <Label htmlFor="name">Name *</Label>
+                  <Input id="name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Your name" required />
+                </div>
+                <div>
+                  <Label htmlFor="email">Email *</Label>
+                  <Input id="email" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="you@example.com" required />
+                </div>
+              </div>
+              <div>
+                <Label htmlFor="subject">Subject</Label>
+                <Input id="subject" value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })} placeholder="What's this about?" />
+              </div>
+              <div>
+                <Label htmlFor="message">Message *</Label>
+                <Textarea id="message" value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} placeholder="Tell me about your project or idea..." rows={6} required />
+              </div>
+              <Button type="submit" size="lg" className="w-full group" disabled={loading}>
+                {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4 transition-transform group-hover:translate-x-1" />}
+                {loading ? "Sending..." : "Send Message"}
+              </Button>
+            </form>
+          </motion.div>
 
-            return (
-              <motion.div
-                key={contact.label}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.15, duration: 0.5 }}
-              >
-                <Wrapper
-                  {...(wrapperProps as any)}
-                  className="group block rounded-xl border border-border/50 bg-card p-6 text-center transition-all hover:border-primary/30 hover:shadow-lg"
-                >
-                  <div className={`mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br ${contact.gradient} shadow-lg`}>
-                    <contact.icon className="h-7 w-7 text-white" />
-                  </div>
-                  <h3 className="mb-1 text-lg font-bold text-foreground">{contact.label}</h3>
-                  <span className="mb-3 inline-block rounded-full bg-primary/10 px-3 py-0.5 text-xs font-medium text-primary">
-                    {contact.tag}
-                  </span>
-                  <p className="text-sm text-muted-foreground">{contact.value}</p>
-                </Wrapper>
-              </motion.div>
-            );
-          })}
+          {/* Contact Cards */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.5 }}>
+            <h2 className="mb-6 text-xl font-bold text-foreground">Other Channels</h2>
+            <div className="space-y-4">
+              {contacts.map((contact, i) => {
+                const Wrapper = contact.href ? "a" : "div";
+                const wrapperProps = contact.href ? { href: contact.href, target: "_blank", rel: "noopener noreferrer" } : {};
+
+                return (
+                  <motion.div key={contact.label} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 + i * 0.1, duration: 0.5 }}>
+                    <Wrapper {...(wrapperProps as any)}
+                      className="group flex items-center gap-4 rounded-xl border border-border/50 bg-card p-5 transition-all hover:border-primary/30 hover:shadow-lg">
+                      <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${contact.gradient} shadow-lg`}>
+                        <contact.icon className="h-6 w-6 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-bold text-foreground">{contact.label}</h3>
+                          <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">{contact.tag}</span>
+                        </div>
+                        <p className="text-sm text-muted-foreground">{contact.value}</p>
+                      </div>
+                    </Wrapper>
+                  </motion.div>
+                );
+              })}
+            </div>
+
+            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}
+              className="mt-8 text-sm text-muted-foreground">
+              I typically respond within <strong className="text-foreground">24 hours</strong>. For urgent inquiries, Discord is the fastest way to reach me.
+            </motion.p>
+          </motion.div>
         </div>
-
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6 }}
-          className="mt-12 text-center text-sm text-muted-foreground"
-        >
-          I typically respond within <strong className="text-foreground">24 hours</strong>. For urgent inquiries, Discord is the fastest way to reach me.
-        </motion.p>
       </section>
     </div>
   );
