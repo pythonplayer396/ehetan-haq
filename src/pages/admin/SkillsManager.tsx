@@ -71,34 +71,34 @@ const SkillsManager = () => {
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Skills</h1>
           <p className="text-sm text-muted-foreground mt-1">{items.length} skills across {Object.keys(grouped).length} categories</p>
         </div>
-        <Button onClick={openNew}><Plus className="mr-2 h-4 w-4" /> Add Skill</Button>
+        <Button onClick={openNew} className="w-full sm:w-auto"><Plus className="mr-2 h-4 w-4" /> Add Skill</Button>
       </div>
 
       <div className="space-y-6">
         {Object.entries(grouped).map(([cat, skills]) => (
-          <div key={cat} className="rounded-xl border border-border bg-card p-5">
+          <div key={cat} className="rounded-xl border border-border bg-card p-4 sm:p-5">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-lg font-bold text-foreground">{cat}</h2>
               <span className="text-xs text-muted-foreground">{skills.length} skills</span>
             </div>
             <div className="space-y-3">
               {skills.map((skill: any) => (
-                <div key={skill.id} className="flex items-center gap-4">
-                  <div className="flex-1">
+                <div key={skill.id} className="flex items-center gap-3 sm:gap-4">
+                  <div className="flex-1 min-w-0">
                     <div className="mb-1 flex justify-between text-sm">
-                      <span className="text-foreground">{skill.name}</span>
-                      <span className="font-mono text-muted-foreground">{skill.proficiency}%</span>
+                      <span className="text-foreground truncate">{skill.name}</span>
+                      <span className="font-mono text-muted-foreground shrink-0 ml-2">{skill.proficiency}%</span>
                     </div>
                     <div className="h-2 w-full rounded-full bg-secondary">
                       <div className="h-full rounded-full transition-all" style={{ width: `${skill.proficiency}%`, backgroundColor: skill.color }} />
                     </div>
                   </div>
-                  <div className="flex gap-1">
+                  <div className="flex gap-1 shrink-0">
                     <Button variant="ghost" size="icon" onClick={() => openEdit(skill)}><Edit className="h-3 w-3" /></Button>
                     <Button variant="ghost" size="icon" onClick={() => handleDelete(skill.id)}><Trash2 className="h-3 w-3 text-destructive" /></Button>
                   </div>

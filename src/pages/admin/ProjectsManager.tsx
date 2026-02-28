@@ -98,54 +98,56 @@ const ProjectsManager = () => {
   const githubProjects = items.filter(i => !i.link && i.github_url && (!search || i.title.toLowerCase().includes(search.toLowerCase())));
 
   const ProjectCard = ({ item }: { item: any }) => (
-    <div className="rounded-xl border border-border bg-card p-4 flex gap-4">
-      {item.image_url ? (
-        <img src={item.image_url} alt={item.title} className="h-20 w-20 rounded-lg object-cover flex-shrink-0" />
-      ) : (
-        <div className="flex h-20 w-20 items-center justify-center rounded-lg bg-primary/10 text-2xl font-bold text-primary flex-shrink-0">
-          {item.title[0]}
-        </div>
-      )}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-start justify-between gap-2">
-          <div>
-            <div className="flex items-center gap-2">
-              <h3 className="font-semibold text-foreground">{item.title}</h3>
-              {item.featured && <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />}
-              <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${
-                item.status === "active" ? "bg-green-500/15 text-green-600" : item.status === "coming_soon" ? "bg-yellow-500/15 text-yellow-600" : "bg-muted text-muted-foreground"
-              }`}>{item.status}</span>
-            </div>
-            {item.description && <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{item.description}</p>}
-          </div>
-          <div className="flex gap-1 flex-shrink-0">
-            <Button variant="ghost" size="icon" onClick={() => openEdit(item)}><Edit className="h-4 w-4" /></Button>
-            <Button variant="ghost" size="icon" onClick={() => handleDelete(item.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
-          </div>
-        </div>
-        <div className="flex items-center gap-3 mt-2">
-          {item.link && <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline flex items-center gap-1"><Globe className="h-3 w-3" /> Live</a>}
-          {item.github_url && <a href={item.github_url} target="_blank" rel="noopener noreferrer" className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"><Github className="h-3 w-3" /> Repo</a>}
-        </div>
-        {(item.tags || []).length > 0 && (
-          <div className="flex flex-wrap gap-1 mt-2">
-            {item.tags.map((t: string) => <Badge key={t} variant="secondary" className="text-xs">{t}</Badge>)}
+    <div className="rounded-xl border border-border bg-card p-4">
+      <div className="flex gap-4">
+        {item.image_url ? (
+          <img src={item.image_url} alt={item.title} className="h-16 w-16 sm:h-20 sm:w-20 rounded-lg object-cover flex-shrink-0" />
+        ) : (
+          <div className="flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-lg bg-primary/10 text-2xl font-bold text-primary flex-shrink-0">
+            {item.title[0]}
           </div>
         )}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h3 className="font-semibold text-foreground truncate">{item.title}</h3>
+                {item.featured && <Star className="h-4 w-4 text-yellow-500 fill-yellow-500 shrink-0" />}
+                <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold shrink-0 ${
+                  item.status === "active" ? "bg-green-500/15 text-green-600" : item.status === "coming_soon" ? "bg-yellow-500/15 text-yellow-600" : "bg-muted text-muted-foreground"
+                }`}>{item.status}</span>
+              </div>
+              {item.description && <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{item.description}</p>}
+            </div>
+            <div className="flex gap-1 flex-shrink-0">
+              <Button variant="ghost" size="icon" onClick={() => openEdit(item)}><Edit className="h-4 w-4" /></Button>
+              <Button variant="ghost" size="icon" onClick={() => handleDelete(item.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+            </div>
+          </div>
+        </div>
       </div>
+      <div className="flex items-center gap-3 mt-3 pl-0 sm:pl-24">
+        {item.link && <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline flex items-center gap-1"><Globe className="h-3 w-3" /> Live</a>}
+        {item.github_url && <a href={item.github_url} target="_blank" rel="noopener noreferrer" className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"><Github className="h-3 w-3" /> Repo</a>}
+      </div>
+      {(item.tags || []).length > 0 && (
+        <div className="flex flex-wrap gap-1 mt-2 pl-0 sm:pl-24">
+          {item.tags.map((t: string) => <Badge key={t} variant="secondary" className="text-xs">{t}</Badge>)}
+        </div>
+      )}
     </div>
   );
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Projects</h1>
           <p className="text-sm text-muted-foreground mt-1">
             {items.length} total · {liveProjects.length} live · {githubProjects.length} GitHub-only · {items.filter(i => i.featured).length} featured
           </p>
         </div>
-        <Button onClick={openNew}><Plus className="mr-2 h-4 w-4" /> New Project</Button>
+        <Button onClick={openNew} className="w-full sm:w-auto"><Plus className="mr-2 h-4 w-4" /> New Project</Button>
       </div>
 
       <div className="mb-4 relative">
@@ -154,9 +156,9 @@ const ProjectsManager = () => {
       </div>
 
       <Tabs defaultValue="live" className="w-full">
-        <TabsList className="mb-4">
-          <TabsTrigger value="live" className="flex items-center gap-2"><Globe className="h-4 w-4" /> Live <Badge variant="secondary" className="ml-1 text-xs">{liveProjects.length}</Badge></TabsTrigger>
-          <TabsTrigger value="github" className="flex items-center gap-2"><Github className="h-4 w-4" /> GitHub <Badge variant="secondary" className="ml-1 text-xs">{githubProjects.length}</Badge></TabsTrigger>
+        <TabsList className="mb-4 w-full sm:w-auto">
+          <TabsTrigger value="live" className="flex-1 sm:flex-none flex items-center gap-2"><Globe className="h-4 w-4" /> Live <Badge variant="secondary" className="ml-1 text-xs">{liveProjects.length}</Badge></TabsTrigger>
+          <TabsTrigger value="github" className="flex-1 sm:flex-none flex items-center gap-2"><Github className="h-4 w-4" /> GitHub <Badge variant="secondary" className="ml-1 text-xs">{githubProjects.length}</Badge></TabsTrigger>
         </TabsList>
         <TabsContent value="live">
           <div className="space-y-3">

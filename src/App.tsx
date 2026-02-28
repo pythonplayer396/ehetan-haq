@@ -54,6 +54,7 @@ const AppContent = () => {
             <Route path="categories" element={<CategoriesManager />} />
             <Route path="projects" element={<ProjectsManager />} />
             <Route path="services" element={<ServicesManager />} />
+            <Route path="skills" element={<SkillsManager />} />
             <Route path="certificates" element={<CertificatesManager />} />
             <Route path="messages" element={<MessagesManager />} />
             <Route path="analytics" element={<AnalyticsDashboard />} />
