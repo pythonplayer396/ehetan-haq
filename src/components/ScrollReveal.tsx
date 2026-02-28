@@ -27,7 +27,7 @@ const ScrollReveal = ({
   const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
 
   return (
-    <motion.div ref={ref} style={{ y, scale, opacity }} className={className}>
+    <motion.div ref={ref} style={{ y, scale, opacity }} className={`relative ${className}`}>
       {children}
     </motion.div>
   );
