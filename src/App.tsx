@@ -4,15 +4,61 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { AuthProvider } from "@/hooks/useAuth";
+import { usePageTracking } from "@/hooks/usePageTracking";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ParticleBackground from "@/components/ParticleBackground";
 import Index from "./pages/Index";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
+import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
+import Login from "./pages/Login";
+import AdminLayout from "./pages/admin/AdminLayout";
+import Dashboard from "./pages/admin/Dashboard";
+import PostsManager from "./pages/admin/PostsManager";
+import CategoriesManager from "./pages/admin/CategoriesManager";
+import ProjectsManager from "./pages/admin/ProjectsManager";
+import ServicesManager from "./pages/admin/ServicesManager";
+import SkillsManager from "./pages/admin/SkillsManager";
+import MessagesManager from "./pages/admin/MessagesManager";
+import AnalyticsDashboard from "./pages/admin/AnalyticsDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
+
+const AppContent = () => {
+  usePageTracking();
+  return (
+    <>
+      <ParticleBackground />
+      <Navbar />
+      <main className="min-h-screen">
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:slug" element={<BlogPost />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<Dashboard />} />
+            <Route path="posts" element={<PostsManager />} />
+            <Route path="categories" element={<CategoriesManager />} />
+            <Route path="projects" element={<ProjectsManager />} />
+            <Route path="services" element={<ServicesManager />} />
+            <Route path="skills" element={<SkillsManager />} />
+            <Route path="messages" element={<MessagesManager />} />
+            <Route path="analytics" element={<AnalyticsDashboard />} />
+          </Route>
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </main>
+      <Footer />
+    </>
+  );
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -21,17 +67,9 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <ParticleBackground />
-          <Navbar />
-          <main className="min-h-screen">
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </main>
-          <Footer />
+          <AuthProvider>
+            <AppContent />
+          </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>
     </ThemeProvider>
