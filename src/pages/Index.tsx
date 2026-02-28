@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight, Github, ExternalLink, Award, X } from "lucide-react";
@@ -28,6 +28,39 @@ const fadeUp = {
     opacity: 1, y: 0,
     transition: { delay: i * 0.1, duration: 0.5 },
   }),
+};
+
+const Lightbox = ({ src, onClose }: { src: string; onClose: () => void }) => {
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
+  }, [onClose]);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-sm cursor-pointer p-6"
+      onClick={onClose}
+    >
+      <button
+        onClick={(e) => { e.stopPropagation(); onClose(); }}
+        className="absolute top-5 right-5 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-black/60 text-white shadow-lg transition-colors hover:bg-white/20"
+      >
+        <X className="h-5 w-5" />
+      </button>
+      <motion.img
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.3 }}
+        src={src}
+        alt="Certificate"
+        className="max-h-[85vh] max-w-[90vw] rounded-xl object-contain shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      />
+    </motion.div>
+  );
 };
 
 const Index = () => {
@@ -246,28 +279,7 @@ const Index = () => {
       </section>
       {/* Lightbox */}
       {lightboxImg && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm cursor-pointer p-6"
-          onClick={() => setLightboxImg(null)}
-        >
-          <button
-            onClick={() => setLightboxImg(null)}
-            className="absolute top-6 right-6 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-sm transition-colors hover:bg-white/20"
-          >
-            <X className="h-5 w-5" />
-          </button>
-          <motion.img
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.3 }}
-            src={lightboxImg}
-            alt="Certificate"
-            className="max-h-[85vh] max-w-[90vw] rounded-xl object-contain shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          />
-        </motion.div>
+        <Lightbox src={lightboxImg} onClose={() => setLightboxImg(null)} />
       )}
     </div>
   );
