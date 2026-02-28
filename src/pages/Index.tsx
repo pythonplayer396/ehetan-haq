@@ -1,6 +1,10 @@
 import { Link } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { ArrowRight, ExternalLink, Github, Shield, Bug, Search } from "lucide-react";
+import { ArrowRight, Github } from "lucide-react";
+import iconSilkenbd from "@/assets/icon-silkenbd.png";
+import iconSentinel from "@/assets/icon-sentinel.png";
+import iconEvilDroid from "@/assets/icon-evil-droid.jpg";
+import iconMrHolmes from "@/assets/icon-mrholmes.png";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import TechIcon from "@/components/TechIcon";
@@ -142,8 +146,8 @@ const Index = () => {
                 className="group rounded-xl border border-border/50 bg-card/80 backdrop-blur-sm p-6 transition-all hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5"
               >
                 <div className="mb-4 flex items-start justify-between">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                    <ExternalLink className="h-6 w-6 text-primary" />
+                  <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 overflow-hidden">
+                    <img src={iconSilkenbd} alt="SilkenBD" className="h-8 w-8 object-contain" />
                   </div>
                   <Badge variant="secondary" className="text-xs">E-commerce</Badge>
                 </div>
@@ -163,21 +167,21 @@ const Index = () => {
                 {
                   name: "Sentinel",
                   desc: "A comprehensive web security auditing tool for vulnerability assessment and penetration testing workflows.",
-                  icon: Shield,
+                  image: iconSentinel,
                   url: "https://github.com/pythonplayer396/sentinel",
                   tags: ["Python", "Security", "CLI"],
                 },
                 {
                   name: "Evil-Droid",
                   desc: "An educational penetration testing framework designed for learning mobile security concepts and ethical hacking.",
-                  icon: Bug,
+                  image: iconEvilDroid,
                   url: "https://github.com/pythonplayer396/evil-droid",
                   tags: ["Bash", "Android", "Security"],
                 },
                 {
                   name: "MR.Holmes",
                   desc: "An OSINT reconnaissance framework for gathering publicly available intelligence across multiple data sources.",
-                  icon: Search,
+                  image: iconMrHolmes,
                   url: "https://github.com/pythonplayer396/MR.Holems-",
                   tags: ["Python", "OSINT", "Recon"],
                 },
@@ -194,8 +198,8 @@ const Index = () => {
                   className="group rounded-xl border border-border/50 bg-card/80 backdrop-blur-sm p-6 transition-all hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5"
                 >
                   <div className="mb-4 flex items-start justify-between">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                      <project.icon className="h-6 w-6 text-primary" />
+                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 overflow-hidden">
+                      <img src={project.image} alt={project.name} className="h-8 w-8 object-contain" />
                     </div>
                     <Github className="h-5 w-5 text-muted-foreground transition-colors group-hover:text-primary" />
                   </div>
