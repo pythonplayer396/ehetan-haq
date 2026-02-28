@@ -137,48 +137,50 @@ const PostsManager = () => {
   const PostCard = ({ post }: { post: Post }) => {
     const cat = getCat(post.category_id);
     return (
-      <div className="rounded-xl border border-border bg-card p-4 flex gap-4">
-        {post.cover_image ? (
-          <img src={post.cover_image} alt={post.title} className="h-24 w-32 rounded-lg object-cover flex-shrink-0" />
-        ) : (
-          <div className="flex h-24 w-32 items-center justify-center rounded-lg bg-primary/10 flex-shrink-0">
-            <ImageIcon className="h-8 w-8 text-primary/40" />
-          </div>
-        )}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-2">
-            <div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <h3 className="font-semibold text-foreground">{post.title}</h3>
-                <button onClick={() => toggleStatus(post)} className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold cursor-pointer ${
-                  post.status === "published" ? "bg-green-500/15 text-green-600" :
-                  post.status === "archived" ? "bg-muted text-muted-foreground" :
-                  "bg-yellow-500/15 text-yellow-600"
-                }`}>{post.status}</button>
+      <div className="rounded-xl border border-border bg-card p-4">
+        <div className="flex gap-4">
+          {post.cover_image ? (
+            <img src={post.cover_image} alt={post.title} className="h-16 w-20 sm:h-24 sm:w-32 rounded-lg object-cover flex-shrink-0" />
+          ) : (
+            <div className="flex h-16 w-20 sm:h-24 sm:w-32 items-center justify-center rounded-lg bg-primary/10 flex-shrink-0">
+              <ImageIcon className="h-6 w-6 sm:h-8 sm:w-8 text-primary/40" />
+            </div>
+          )}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className="font-semibold text-foreground truncate">{post.title}</h3>
+                  <button onClick={() => toggleStatus(post)} className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold cursor-pointer shrink-0 ${
+                    post.status === "published" ? "bg-green-500/15 text-green-600" :
+                    post.status === "archived" ? "bg-muted text-muted-foreground" :
+                    "bg-yellow-500/15 text-yellow-600"
+                  }`}>{post.status}</button>
+                </div>
+                {post.excerpt && <p className="text-sm text-muted-foreground mt-1 line-clamp-2 hidden sm:block">{post.excerpt}</p>}
               </div>
-              {post.excerpt && <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{post.excerpt}</p>}
-            </div>
-            <div className="flex gap-1 flex-shrink-0">
-              {post.status === "published" && (
-                <Button variant="ghost" size="icon" asChild>
-                  <a href={`/blog/${post.slug}`} target="_blank" rel="noopener noreferrer"><Eye className="h-4 w-4" /></a>
-                </Button>
-              )}
-              <Button variant="ghost" size="icon" onClick={() => openEdit(post)}><Edit className="h-4 w-4" /></Button>
-              <Button variant="ghost" size="icon" onClick={() => handleDelete(post.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+              <div className="flex gap-1 flex-shrink-0">
+                {post.status === "published" && (
+                  <Button variant="ghost" size="icon" asChild>
+                    <a href={`/blog/${post.slug}`} target="_blank" rel="noopener noreferrer"><Eye className="h-4 w-4" /></a>
+                  </Button>
+                )}
+                <Button variant="ghost" size="icon" onClick={() => openEdit(post)}><Edit className="h-4 w-4" /></Button>
+                <Button variant="ghost" size="icon" onClick={() => handleDelete(post.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+              </div>
             </div>
           </div>
-          <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
-            {cat && (
-              <span className="flex items-center gap-1">
-                <span className="h-2 w-2 rounded-full" style={{ backgroundColor: cat.color || '#888' }} />
-                {cat.name}
-              </span>
-            )}
-            <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{post.reading_time_minutes || 1} min</span>
-            <span className="flex items-center gap-1"><FileText className="h-3 w-3" />{wordCount(post.content)} words</span>
-            <span className="flex items-center gap-1"><Calendar className="h-3 w-3" />{new Date(post.created_at).toLocaleDateString()}</span>
-          </div>
+        </div>
+        <div className="flex items-center gap-3 sm:gap-4 mt-3 text-xs text-muted-foreground flex-wrap pl-0 sm:pl-36">
+          {cat && (
+            <span className="flex items-center gap-1">
+              <span className="h-2 w-2 rounded-full" style={{ backgroundColor: cat.color || '#888' }} />
+              {cat.name}
+            </span>
+          )}
+          <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{post.reading_time_minutes || 1} min</span>
+          <span className="flex items-center gap-1 hidden sm:flex"><FileText className="h-3 w-3" />{wordCount(post.content)} words</span>
+          <span className="flex items-center gap-1"><Calendar className="h-3 w-3" />{new Date(post.created_at).toLocaleDateString()}</span>
         </div>
       </div>
     );
@@ -186,14 +188,14 @@ const PostsManager = () => {
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Blog Posts</h1>
           <p className="text-sm text-muted-foreground mt-1">
             {posts.length} total · {posts.filter(p => p.status === "published").length} published · {posts.filter(p => p.status === "draft").length} drafts
           </p>
         </div>
-        <Button onClick={openNew}><Plus className="mr-2 h-4 w-4" /> New Post</Button>
+        <Button onClick={openNew} className="w-full sm:w-auto"><Plus className="mr-2 h-4 w-4" /> New Post</Button>
       </div>
 
       <div className="mb-4 flex flex-col sm:flex-row gap-3">
@@ -202,7 +204,7 @@ const PostsManager = () => {
           <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search posts..." className="pl-9" />
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-[160px]"><Filter className="mr-2 h-4 w-4" /><SelectValue /></SelectTrigger>
+          <SelectTrigger className="w-full sm:w-[160px]"><Filter className="mr-2 h-4 w-4" /><SelectValue /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Status</SelectItem>
             <SelectItem value="draft">Draft</SelectItem>
@@ -239,7 +241,7 @@ const PostsManager = () => {
               <div><Label>Title</Label><Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value, slug: generateSlug(e.target.value) })} placeholder="My awesome post" /></div>
               <div><Label>Slug</Label><Input value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} /></div>
               <div><Label>Excerpt</Label><Textarea value={form.excerpt} onChange={(e) => setForm({ ...form, excerpt: e.target.value })} rows={2} placeholder="Brief summary..." /></div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label>Category</Label>
                   <Select value={form.category_id || "none"} onValueChange={(v) => setForm({ ...form, category_id: v === "none" ? "" : v })}>

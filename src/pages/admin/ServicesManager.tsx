@@ -87,47 +87,49 @@ const ServicesManager = () => {
   const filtered = items.filter(i => !search || i.title.toLowerCase().includes(search.toLowerCase()));
 
   const ServiceCard = ({ item }: { item: any }) => (
-    <div className="rounded-xl border border-border bg-card p-4 flex gap-4">
-      {item.icon_url ? (
-        <img src={item.icon_url} alt={item.title} className="h-20 w-20 rounded-lg object-cover flex-shrink-0" />
-      ) : (
-        <div className="flex h-20 w-20 items-center justify-center rounded-lg bg-primary/10 text-2xl font-bold text-primary flex-shrink-0">
-          {item.title[0]}
-        </div>
-      )}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-start justify-between gap-2">
-          <div>
-            <div className="flex items-center gap-2">
-              <h3 className="font-semibold text-foreground">{item.title}</h3>
-              <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${item.active ? "bg-green-500/15 text-green-600" : "bg-muted text-muted-foreground"}`}>
-                {item.active ? "Active" : "Inactive"}
-              </span>
-            </div>
-            {item.description && <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{item.description}</p>}
-          </div>
-          <div className="flex gap-1 flex-shrink-0">
-            <Button variant="ghost" size="icon" onClick={() => openEdit(item)}><Edit className="h-4 w-4" /></Button>
-            <Button variant="ghost" size="icon" onClick={() => handleDelete(item.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
-          </div>
-        </div>
-        {(item.features || []).length > 0 && (
-          <div className="flex flex-wrap gap-1 mt-2">
-            {item.features.map((f: string) => <Badge key={f} variant="secondary" className="text-xs">{f}</Badge>)}
+    <div className="rounded-xl border border-border bg-card p-4">
+      <div className="flex gap-4">
+        {item.icon_url ? (
+          <img src={item.icon_url} alt={item.title} className="h-16 w-16 sm:h-20 sm:w-20 rounded-lg object-cover flex-shrink-0" />
+        ) : (
+          <div className="flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-lg bg-primary/10 text-2xl font-bold text-primary flex-shrink-0">
+            {item.title[0]}
           </div>
         )}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h3 className="font-semibold text-foreground truncate">{item.title}</h3>
+                <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold shrink-0 ${item.active ? "bg-green-500/15 text-green-600" : "bg-muted text-muted-foreground"}`}>
+                  {item.active ? "Active" : "Inactive"}
+                </span>
+              </div>
+              {item.description && <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{item.description}</p>}
+            </div>
+            <div className="flex gap-1 flex-shrink-0">
+              <Button variant="ghost" size="icon" onClick={() => openEdit(item)}><Edit className="h-4 w-4" /></Button>
+              <Button variant="ghost" size="icon" onClick={() => handleDelete(item.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+            </div>
+          </div>
+        </div>
       </div>
+      {(item.features || []).length > 0 && (
+        <div className="flex flex-wrap gap-1 mt-3 pl-0 sm:pl-24">
+          {item.features.map((f: string) => <Badge key={f} variant="secondary" className="text-xs">{f}</Badge>)}
+        </div>
+      )}
     </div>
   );
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Services</h1>
           <p className="text-sm text-muted-foreground mt-1">{items.length} services · {items.filter(i => i.active).length} active</p>
         </div>
-        <Button onClick={openNew}><Plus className="mr-2 h-4 w-4" /> New Service</Button>
+        <Button onClick={openNew} className="w-full sm:w-auto"><Plus className="mr-2 h-4 w-4" /> New Service</Button>
       </div>
 
       <div className="mb-4 relative">
