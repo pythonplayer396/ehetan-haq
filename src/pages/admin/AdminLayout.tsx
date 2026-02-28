@@ -3,7 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import {
   LayoutDashboard, FileText, FolderKanban, Wrench, BarChart3,
-  MessageSquare, Settings, LogOut, GraduationCap, Menu, X,
+  MessageSquare, Settings, LogOut, GraduationCap, Menu, X, Award,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -15,6 +15,7 @@ const navItems = [
   { to: "/admin/projects", icon: FolderKanban, label: "Projects" },
   { to: "/admin/services", icon: Wrench, label: "Services" },
   { to: "/admin/skills", icon: GraduationCap, label: "Skills" },
+  { to: "/admin/certificates", icon: Award, label: "Certificates" },
   { to: "/admin/messages", icon: MessageSquare, label: "Messages" },
   { to: "/admin/analytics", icon: BarChart3, label: "Analytics" },
 ];

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { ArrowRight, Github, ExternalLink } from "lucide-react";
+import { ArrowRight, Github, ExternalLink, Award } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -39,15 +39,18 @@ const Index = () => {
 
   const [projects, setProjects] = useState<any[]>([]);
   const [skills, setSkills] = useState<any[]>([]);
+  const [certificates, setCertificates] = useState<any[]>([]);
 
   useEffect(() => {
     const load = async () => {
-      const [projRes, skillRes] = await Promise.all([
+      const [projRes, skillRes, certRes] = await Promise.all([
         supabase.from("projects").select("*").eq("status", "active").order("sort_order"),
         supabase.from("skills").select("*").order("category").order("sort_order"),
+        supabase.from("certificates").select("*").eq("active", true).order("sort_order"),
       ]);
       setProjects((projRes.data && projRes.data.length > 0) ? projRes.data : fallbackProjects);
       setSkills(skillRes.data || []);
+      setCertificates(certRes.data || []);
     };
     load();
   }, []);
@@ -153,6 +156,75 @@ const Index = () => {
           </div>
         </ScrollReveal>
       </section>
+
+      {/* Certificates */}
+      {certificates.length > 0 && (
+        <section className="relative border-t border-border/30 py-24">
+          <ScrollReveal parallax={20}>
+            <div className="container mx-auto px-6">
+              <div className="flex items-center gap-3 mb-3">
+                <Award className="h-5 w-5 text-primary" />
+                <p className="font-mono text-sm text-primary">Certifications</p>
+              </div>
+              <p className="mb-10 text-3xl font-bold text-foreground">Certificates & Achievements</p>
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {certificates.map((cert, i) => (
+                  <motion.div
+                    key={cert.id}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.1, duration: 0.6 }}
+                  >
+                    <div className="group rounded-xl border border-border/50 bg-card/80 backdrop-blur-sm overflow-hidden transition-all hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 h-full flex flex-col">
+                      {cert.image_url ? (
+                        <div className="relative aspect-[16/10] overflow-hidden">
+                          <img
+                            src={cert.image_url}
+                            alt={cert.title}
+                            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                        </div>
+                      ) : (
+                        <div className="flex aspect-[16/10] items-center justify-center bg-primary/5">
+                          <Award className="h-12 w-12 text-primary/30" />
+                        </div>
+                      )}
+                      <div className="flex flex-col flex-1 p-5">
+                        <h3 className="text-lg font-bold text-foreground mb-1">{cert.title}</h3>
+                        {cert.issuer && (
+                          <p className="text-sm font-medium text-primary mb-2">{cert.issuer}</p>
+                        )}
+                        {cert.description && (
+                          <p className="text-sm text-muted-foreground leading-relaxed mb-3 flex-1">{cert.description}</p>
+                        )}
+                        <div className="flex items-center justify-between mt-auto pt-3 border-t border-border/30">
+                          {cert.issue_date && (
+                            <span className="text-xs text-muted-foreground">
+                              {new Date(cert.issue_date).toLocaleDateString("en-US", { month: "short", year: "numeric" })}
+                            </span>
+                          )}
+                          {cert.credential_url && (
+                            <a
+                              href={cert.credential_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-primary hover:underline flex items-center gap-1"
+                            >
+                              View Credential <ExternalLink className="h-3 w-3" />
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </ScrollReveal>
+        </section>
+      )}
 
       {/* CTA */}
       <section className="relative border-t border-border/30 py-24">

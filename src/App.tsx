@@ -24,6 +24,7 @@ import ServicesManager from "./pages/admin/ServicesManager";
 import SkillsManager from "./pages/admin/SkillsManager";
 import MessagesManager from "./pages/admin/MessagesManager";
 import AnalyticsDashboard from "./pages/admin/AnalyticsDashboard";
+import CertificatesManager from "./pages/admin/CertificatesManager";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -49,6 +50,7 @@ const AppContent = () => {
             <Route path="projects" element={<ProjectsManager />} />
             <Route path="services" element={<ServicesManager />} />
             <Route path="skills" element={<SkillsManager />} />
+            <Route path="certificates" element={<CertificatesManager />} />
             <Route path="messages" element={<MessagesManager />} />
             <Route path="analytics" element={<AnalyticsDashboard />} />
           </Route>
