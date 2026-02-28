@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { AuthProvider } from "@/hooks/useAuth";
 import { usePageTracking } from "@/hooks/usePageTracking";
@@ -31,11 +31,14 @@ const queryClient = new QueryClient();
 
 const AppContent = () => {
   usePageTracking();
+  const location = useLocation();
+  const isAdmin = location.pathname.startsWith("/admin");
+
   return (
     <>
-      <ParticleBackground />
-      <Navbar />
-      <main className="min-h-screen">
+      {!isAdmin && <ParticleBackground />}
+      {!isAdmin && <Navbar />}
+      <main className={isAdmin ? "" : "min-h-screen"}>
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/about" element={<About />} />
@@ -49,7 +52,6 @@ const AppContent = () => {
             <Route path="categories" element={<CategoriesManager />} />
             <Route path="projects" element={<ProjectsManager />} />
             <Route path="services" element={<ServicesManager />} />
-            <Route path="skills" element={<SkillsManager />} />
             <Route path="certificates" element={<CertificatesManager />} />
             <Route path="messages" element={<MessagesManager />} />
             <Route path="analytics" element={<AnalyticsDashboard />} />
@@ -57,11 +59,10 @@ const AppContent = () => {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
-      <Footer />
+      {!isAdmin && <Footer />}
     </>
   );
 };
-
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>

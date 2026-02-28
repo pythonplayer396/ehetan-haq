@@ -36,7 +36,7 @@ const AdminLayout = () => {
   if (!user) return <Navigate to="/login" replace />;
   if (!isAdmin) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4 pt-[var(--nav-height)]">
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4">
         <p className="text-xl font-bold text-foreground">Access Denied</p>
         <p className="text-muted-foreground">You don't have admin privileges.</p>
         <Button onClick={signOut} variant="outline">Sign Out</Button>
@@ -48,7 +48,7 @@ const AdminLayout = () => {
     exact ? location.pathname === path : location.pathname.startsWith(path);
 
   return (
-    <div className="flex min-h-screen pt-[var(--nav-height)]">
+    <div className="flex min-h-screen">
       {/* Mobile toggle */}
       <button
         className="fixed bottom-4 right-4 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg md:hidden"
@@ -60,7 +60,7 @@ const AdminLayout = () => {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-40 w-64 border-r border-border bg-card pt-[var(--nav-height)] transition-transform md:translate-x-0",
+          "fixed inset-y-0 left-0 z-40 w-64 border-r border-border bg-card transition-transform md:translate-x-0",
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
