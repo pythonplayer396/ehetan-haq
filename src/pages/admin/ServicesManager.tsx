@@ -6,15 +6,26 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Edit, Trash2, GripVertical } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { Plus, Edit, Trash2, Search, X } from "lucide-react";
 import { toast } from "sonner";
+import { useImageUpload } from "@/hooks/useImageUpload";
+import ImageUploadField from "@/components/ImageUploadField";
+
+const defaultForm = {
+  title: "", description: "", icon_url: "", active: true, sort_order: 0,
+};
 
 const ServicesManager = () => {
   const [items, setItems] = useState<any[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<any>(null);
-  const [form, setForm] = useState({ title: "", description: "", icon_url: "", features: "", active: true, sort_order: 0 });
+  const [form, setForm] = useState(defaultForm);
+  const [search, setSearch] = useState("");
+  const [featureInput, setFeatureInput] = useState("");
+  const [features, setFeatures] = useState<string[]>([]);
+  const { upload, uploading } = useImageUpload();
 
   const fetchAll = async () => {
     const { data } = await supabase.from("services").select("*").order("sort_order");
@@ -22,8 +33,28 @@ const ServicesManager = () => {
   };
   useEffect(() => { fetchAll(); }, []);
 
-  const openNew = () => { setEditing(null); setForm({ title: "", description: "", icon_url: "", features: "", active: true, sort_order: 0 }); setDialogOpen(true); };
-  const openEdit = (item: any) => { setEditing(item); setForm({ ...item, features: (item.features || []).join(", ") }); setDialogOpen(true); };
+  const openNew = () => {
+    setEditing(null); setForm(defaultForm); setFeatures([]); setFeatureInput(""); setDialogOpen(true);
+  };
+  const openEdit = (item: any) => {
+    setEditing(item);
+    setForm({ title: item.title, description: item.description || "", icon_url: item.icon_url || "", active: item.active, sort_order: item.sort_order });
+    setFeatures(item.features || []);
+    setFeatureInput("");
+    setDialogOpen(true);
+  };
+
+  const addFeature = () => {
+    if (!featureInput.trim()) return;
+    if (!features.includes(featureInput.trim())) {
+      setFeatures([...features, featureInput.trim()]);
+    }
+    setFeatureInput("");
+  };
+
+  const removeFeature = (f: string) => {
+    setFeatures(features.filter(t => t !== f));
+  };
 
   const handleSave = async () => {
     if (!form.title.trim()) { toast.error("Title is required"); return; }
@@ -31,7 +62,7 @@ const ServicesManager = () => {
       title: form.title.trim(),
       description: form.description || null,
       icon_url: form.icon_url || null,
-      features: form.features.split(",").map((f: string) => f.trim()).filter(Boolean),
+      features,
       active: form.active,
       sort_order: form.sort_order,
     };
@@ -44,16 +75,50 @@ const ServicesManager = () => {
       if (error) { toast.error(error.message); return; }
       toast.success("Service created");
     }
-    setDialogOpen(false);
-    fetchAll();
+    setDialogOpen(false); fetchAll();
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this service?")) return;
     await supabase.from("services").delete().eq("id", id);
-    toast.success("Deleted");
-    fetchAll();
+    toast.success("Deleted"); fetchAll();
   };
+
+  const filtered = items.filter(i => !search || i.title.toLowerCase().includes(search.toLowerCase()));
+
+  const ServiceCard = ({ item }: { item: any }) => (
+    <div className="rounded-xl border border-border bg-card p-4 flex gap-4">
+      {item.icon_url ? (
+        <img src={item.icon_url} alt={item.title} className="h-20 w-20 rounded-lg object-cover flex-shrink-0" />
+      ) : (
+        <div className="flex h-20 w-20 items-center justify-center rounded-lg bg-primary/10 text-2xl font-bold text-primary flex-shrink-0">
+          {item.title[0]}
+        </div>
+      )}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-start justify-between gap-2">
+          <div>
+            <div className="flex items-center gap-2">
+              <h3 className="font-semibold text-foreground">{item.title}</h3>
+              <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${item.active ? "bg-green-500/15 text-green-600" : "bg-muted text-muted-foreground"}`}>
+                {item.active ? "Active" : "Inactive"}
+              </span>
+            </div>
+            {item.description && <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{item.description}</p>}
+          </div>
+          <div className="flex gap-1 flex-shrink-0">
+            <Button variant="ghost" size="icon" onClick={() => openEdit(item)}><Edit className="h-4 w-4" /></Button>
+            <Button variant="ghost" size="icon" onClick={() => handleDelete(item.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+          </div>
+        </div>
+        {(item.features || []).length > 0 && (
+          <div className="flex flex-wrap gap-1 mt-2">
+            {item.features.map((f: string) => <Badge key={f} variant="secondary" className="text-xs">{f}</Badge>)}
+          </div>
+        )}
+      </div>
+    </div>
+  );
 
   return (
     <div>
@@ -64,90 +129,81 @@ const ServicesManager = () => {
         </div>
         <Button onClick={openNew}><Plus className="mr-2 h-4 w-4" /> New Service</Button>
       </div>
-      <div className="rounded-xl border border-border bg-card">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Title</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead>Features</TableHead>
-              <TableHead>Active</TableHead>
-              <TableHead>Order</TableHead>
-              <TableHead className="w-[100px]">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {items.map((item) => (
-              <TableRow key={item.id}>
-                <TableCell>
-                  <div className="flex items-center gap-3">
-                    {item.icon_url ? (
-                      <img src={item.icon_url} alt="" className="h-8 w-8 rounded object-contain" />
-                    ) : (
-                      <div className="flex h-8 w-8 items-center justify-center rounded bg-primary/10 text-sm font-bold text-primary">{item.title[0]}</div>
-                    )}
-                    <span className="font-medium">{item.title}</span>
-                  </div>
-                </TableCell>
-                <TableCell className="max-w-[200px] truncate text-sm text-muted-foreground">{item.description || "—"}</TableCell>
-                <TableCell>
-                  <span className="text-sm text-muted-foreground">{(item.features || []).length} features</span>
-                </TableCell>
-                <TableCell>
-                  <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${item.active ? "bg-green-500/15 text-green-600" : "bg-muted text-muted-foreground"}`}>
-                    {item.active ? "Active" : "Inactive"}
-                  </span>
-                </TableCell>
-                <TableCell className="text-muted-foreground">{item.sort_order}</TableCell>
-                <TableCell>
-                  <div className="flex gap-1">
-                    <Button variant="ghost" size="icon" onClick={() => openEdit(item)}><Edit className="h-4 w-4" /></Button>
-                    <Button variant="ghost" size="icon" onClick={() => handleDelete(item.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-            {items.length === 0 && (
-              <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-12">No services yet. Add your first one!</TableCell></TableRow>
-            )}
-          </TableBody>
-        </Table>
+
+      <div className="mb-4 relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search services..." className="pl-9" />
+      </div>
+
+      <div className="space-y-3">
+        {filtered.map(item => <ServiceCard key={item.id} item={item} />)}
+        {filtered.length === 0 && (
+          <p className="text-center text-muted-foreground py-12">
+            {search ? "No services match your search." : "No services yet. Add your first one!"}
+          </p>
+        )}
       </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editing ? "Edit Service" : "New Service"}</DialogTitle>
-            <DialogDescription>{editing ? "Update the service details." : "Fill in details for a new service."}</DialogDescription>
+            <DialogDescription>{editing ? "Update the service details." : "Add a new service."}</DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
-            <div><Label>Title</Label><Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="e.g. Web Development" /></div>
-            <div><Label>Description</Label><Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3} placeholder="What does this service include?" /></div>
-            <div>
-              <Label>Icon URL</Label>
-              <Input value={form.icon_url} onChange={(e) => setForm({ ...form, icon_url: e.target.value })} placeholder="https://..." />
-              {form.icon_url && <img src={form.icon_url} alt="Preview" className="mt-2 h-10 w-10 rounded object-contain" onError={(e) => (e.currentTarget.style.display = "none")} />}
-            </div>
-            <div>
-              <Label>Features (comma-separated)</Label>
-              <Textarea value={form.features} onChange={(e) => setForm({ ...form, features: e.target.value })} rows={2} placeholder="Feature 1, Feature 2, Feature 3" />
-              {form.features && (
-                <div className="mt-2 flex flex-wrap gap-1">
-                  {form.features.split(",").map((f, i) => f.trim() && (
-                    <span key={i} className="rounded-full bg-secondary px-2 py-0.5 text-xs text-foreground">{f.trim()}</span>
-                  ))}
+
+          <Tabs defaultValue="details" className="w-full">
+            <TabsList className="w-full">
+              <TabsTrigger value="details" className="flex-1">Details</TabsTrigger>
+              <TabsTrigger value="media" className="flex-1">Image & Features</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="details" className="space-y-4 mt-4">
+              <div><Label>Title</Label><Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="e.g. Web Development" /></div>
+              <div><Label>Description</Label><Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3} placeholder="What does this service include?" /></div>
+              <div className="grid grid-cols-2 gap-4">
+                <div><Label>Sort Order</Label><Input type="number" value={form.sort_order} onChange={(e) => setForm({ ...form, sort_order: parseInt(e.target.value) || 0 })} /></div>
+                <div className="flex items-center gap-2 pt-6">
+                  <Switch checked={form.active} onCheckedChange={(v) => setForm({ ...form, active: v })} />
+                  <Label>Active</Label>
                 </div>
-              )}
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div><Label>Sort Order</Label><Input type="number" value={form.sort_order} onChange={(e) => setForm({ ...form, sort_order: parseInt(e.target.value) || 0 })} /></div>
-              <div className="flex items-center gap-2 pt-6">
-                <Switch checked={form.active} onCheckedChange={(v) => setForm({ ...form, active: v })} />
-                <Label>Active</Label>
               </div>
-            </div>
-            <Button onClick={handleSave} className="w-full">{editing ? "Update Service" : "Create Service"}</Button>
-          </div>
+            </TabsContent>
+
+            <TabsContent value="media" className="space-y-4 mt-4">
+              <ImageUploadField
+                label="Service Icon"
+                value={form.icon_url}
+                onChange={(url) => setForm({ ...form, icon_url: url })}
+                onUpload={(file) => upload(file, "services")}
+                uploading={uploading}
+              />
+              <div>
+                <Label>Features</Label>
+                <div className="flex gap-2">
+                  <Input
+                    value={featureInput}
+                    onChange={(e) => setFeatureInput(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addFeature(); } }}
+                    placeholder="Type a feature and press Enter"
+                    className="flex-1"
+                  />
+                  <Button type="button" variant="outline" onClick={addFeature} size="sm">Add</Button>
+                </div>
+                {features.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mt-2">
+                    {features.map((f) => (
+                      <Badge key={f} variant="secondary" className="flex items-center gap-1 pr-1">
+                        {f}
+                        <button onClick={() => removeFeature(f)} className="ml-1 hover:text-destructive"><X className="h-3 w-3" /></button>
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </TabsContent>
+          </Tabs>
+
+          <Button onClick={handleSave} className="w-full mt-4">{editing ? "Update Service" : "Create Service"}</Button>
         </DialogContent>
       </Dialog>
     </div>
