@@ -2,10 +2,10 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronUp } from "lucide-react";
 import profileImg from "@/assets/profile.jpg";
-import iconWebdev from "@/assets/icon-webdev.jpg";
-import iconMarketing from "@/assets/icon-marketing.jpg";
-import iconBots from "@/assets/icon-bots.jpg";
-import iconBackend from "@/assets/icon-backend.gif";
+import iconWebdev from "@/assets/icon-webdev.png";
+import iconMarketing from "@/assets/icon-marketing.png";
+import iconBots from "@/assets/icon-bots.png";
+import iconBackend from "@/assets/icon-backend.png";
 import KnowledgeGraph from "@/components/KnowledgeGraph";
 import { cn } from "@/lib/utils";
 
