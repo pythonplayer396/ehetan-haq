@@ -11,6 +11,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Edit, Trash2, Eye, Search, Filter, Clock, FileText, Calendar, Image as ImageIcon, X } from "lucide-react";
 import { toast } from "sonner";
+import { useImageUpload } from "@/hooks/useImageUpload";
+import ImageUploadField from "@/components/ImageUploadField";
 
 interface Post {
   id: string; title: string; slug: string; excerpt: string | null; content: string;
@@ -40,6 +42,7 @@ const PostsManager = () => {
   const [form, setForm] = useState({
     title: "", slug: "", excerpt: "", content: "", cover_image: "", category_id: "", status: "draft"
   });
+  const { upload, uploading } = useImageUpload();
 
   const fetchAll = async () => {
     const [{ data: p }, { data: c }, { data: t }] = await Promise.all([
@@ -65,7 +68,6 @@ const PostsManager = () => {
       content: post.content, cover_image: post.cover_image || "",
       category_id: post.category_id || "", status: post.status,
     });
-    // Fetch existing tags for this post
     const { data } = await supabase.from("blog_post_tags").select("tag_id").eq("post_id", post.id);
     setSelectedTags((data || []).map(t => t.tag_id));
     setDialogOpen(true);
@@ -93,7 +95,6 @@ const PostsManager = () => {
       postId = data.id;
     }
 
-    // Save tags
     if (postId) {
       await supabase.from("blog_post_tags").delete().eq("post_id", postId);
       if (selectedTags.length > 0) {
@@ -102,8 +103,7 @@ const PostsManager = () => {
     }
 
     toast.success(editing ? "Post updated" : "Post created");
-    setDialogOpen(false);
-    fetchAll();
+    setDialogOpen(false); fetchAll();
   };
 
   const handleDelete = async (id: string) => {
@@ -150,14 +150,11 @@ const PostsManager = () => {
             <div>
               <div className="flex items-center gap-2 flex-wrap">
                 <h3 className="font-semibold text-foreground">{post.title}</h3>
-                <button
-                  onClick={() => toggleStatus(post)}
-                  className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold cursor-pointer ${
-                    post.status === "published" ? "bg-green-500/15 text-green-600" :
-                    post.status === "archived" ? "bg-muted text-muted-foreground" :
-                    "bg-yellow-500/15 text-yellow-600"
-                  }`}
-                >{post.status}</button>
+                <button onClick={() => toggleStatus(post)} className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold cursor-pointer ${
+                  post.status === "published" ? "bg-green-500/15 text-green-600" :
+                  post.status === "archived" ? "bg-muted text-muted-foreground" :
+                  "bg-yellow-500/15 text-yellow-600"
+                }`}>{post.status}</button>
               </div>
               {post.excerpt && <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{post.excerpt}</p>}
             </div>
@@ -224,7 +221,6 @@ const PostsManager = () => {
         )}
       </div>
 
-      {/* Editor Dialog with Tabs */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
           <DialogHeader>
@@ -286,13 +282,13 @@ const PostsManager = () => {
             </TabsContent>
 
             <TabsContent value="media" className="space-y-4 mt-4">
-              <div>
-                <Label>Cover Image URL</Label>
-                <Input value={form.cover_image} onChange={(e) => setForm({ ...form, cover_image: e.target.value })} placeholder="https://..." />
-                {form.cover_image && (
-                  <img src={form.cover_image} alt="Preview" className="mt-2 rounded-lg max-h-40 w-full object-cover" onError={(e) => (e.currentTarget.style.display = "none")} />
-                )}
-              </div>
+              <ImageUploadField
+                label="Cover Image"
+                value={form.cover_image}
+                onChange={(url) => setForm({ ...form, cover_image: url })}
+                onUpload={(file) => upload(file, "blog")}
+                uploading={uploading}
+              />
               <div>
                 <Label>Tags</Label>
                 {allTags.length === 0 ? (

@@ -9,8 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Edit, Trash2, ExternalLink, Github, Star, Search, Globe, X } from "lucide-react";
+import { Plus, Edit, Trash2, Star, Search, Globe, Github, X } from "lucide-react";
 import { toast } from "sonner";
+import { useImageUpload } from "@/hooks/useImageUpload";
+import ImageUploadField from "@/components/ImageUploadField";
 
 const defaultForm = {
   title: "", description: "", image_url: "", link: "", github_url: "",
@@ -24,6 +26,7 @@ const ProjectsManager = () => {
   const [form, setForm] = useState(defaultForm);
   const [search, setSearch] = useState("");
   const [tagInput, setTagInput] = useState("");
+  const { upload, uploading } = useImageUpload();
 
   const fetchAll = async () => {
     const { data } = await supabase.from("projects").select("*").order("sort_order");
@@ -42,7 +45,6 @@ const ProjectsManager = () => {
   const currentTags = (): string[] => {
     if (editing && Array.isArray(editing.tags)) {
       const formTagsArr = form.tags ? form.tags.split(",").map((t: string) => t.trim()).filter(Boolean) : [];
-      // Use editing tags as base, merged with any new form tags
       return [...new Set([...editing.tags, ...formTagsArr])];
     }
     return form.tags ? form.tags.split(",").map((t: string) => t.trim()).filter(Boolean) : [];
@@ -69,15 +71,10 @@ const ProjectsManager = () => {
     if (!form.title.trim()) { toast.error("Title is required"); return; }
     const tags = currentTags();
     const payload = {
-      title: form.title.trim(),
-      description: form.description || null,
-      image_url: form.image_url || null,
-      link: form.link || null,
-      github_url: form.github_url || null,
-      tags,
-      featured: form.featured,
-      status: form.status,
-      sort_order: form.sort_order,
+      title: form.title.trim(), description: form.description || null,
+      image_url: form.image_url || null, link: form.link || null,
+      github_url: form.github_url || null, tags, featured: form.featured,
+      status: form.status, sort_order: form.sort_order,
     };
     if (editing) {
       const { error } = await supabase.from("projects").update(payload).eq("id", editing.id);
@@ -88,20 +85,17 @@ const ProjectsManager = () => {
       if (error) { toast.error(error.message); return; }
       toast.success("Project created");
     }
-    setDialogOpen(false);
-    fetchAll();
+    setDialogOpen(false); fetchAll();
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this project?")) return;
     await supabase.from("projects").delete().eq("id", id);
-    toast.success("Deleted");
-    fetchAll();
+    toast.success("Deleted"); fetchAll();
   };
 
   const liveProjects = items.filter(i => i.link && (!search || i.title.toLowerCase().includes(search.toLowerCase())));
   const githubProjects = items.filter(i => !i.link && i.github_url && (!search || i.title.toLowerCase().includes(search.toLowerCase())));
-  const allFiltered = items.filter(i => !search || i.title.toLowerCase().includes(search.toLowerCase()));
 
   const ProjectCard = ({ item }: { item: any }) => (
     <div className="rounded-xl border border-border bg-card p-4 flex gap-4">
@@ -130,22 +124,12 @@ const ProjectsManager = () => {
           </div>
         </div>
         <div className="flex items-center gap-3 mt-2">
-          {item.link && (
-            <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline flex items-center gap-1">
-              <Globe className="h-3 w-3" /> Live
-            </a>
-          )}
-          {item.github_url && (
-            <a href={item.github_url} target="_blank" rel="noopener noreferrer" className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1">
-              <Github className="h-3 w-3" /> Repo
-            </a>
-          )}
+          {item.link && <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline flex items-center gap-1"><Globe className="h-3 w-3" /> Live</a>}
+          {item.github_url && <a href={item.github_url} target="_blank" rel="noopener noreferrer" className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"><Github className="h-3 w-3" /> Repo</a>}
         </div>
         {(item.tags || []).length > 0 && (
           <div className="flex flex-wrap gap-1 mt-2">
-            {item.tags.map((t: string) => (
-              <Badge key={t} variant="secondary" className="text-xs">{t}</Badge>
-            ))}
+            {item.tags.map((t: string) => <Badge key={t} variant="secondary" className="text-xs">{t}</Badge>)}
           </div>
         )}
       </div>
@@ -171,128 +155,100 @@ const ProjectsManager = () => {
 
       <Tabs defaultValue="live" className="w-full">
         <TabsList className="mb-4">
-          <TabsTrigger value="live" className="flex items-center gap-2">
-            <Globe className="h-4 w-4" /> Live Projects
-            <Badge variant="secondary" className="ml-1 text-xs">{liveProjects.length}</Badge>
-          </TabsTrigger>
-          <TabsTrigger value="github" className="flex items-center gap-2">
-            <Github className="h-4 w-4" /> GitHub Projects
-            <Badge variant="secondary" className="ml-1 text-xs">{githubProjects.length}</Badge>
-          </TabsTrigger>
+          <TabsTrigger value="live" className="flex items-center gap-2"><Globe className="h-4 w-4" /> Live <Badge variant="secondary" className="ml-1 text-xs">{liveProjects.length}</Badge></TabsTrigger>
+          <TabsTrigger value="github" className="flex items-center gap-2"><Github className="h-4 w-4" /> GitHub <Badge variant="secondary" className="ml-1 text-xs">{githubProjects.length}</Badge></TabsTrigger>
         </TabsList>
-
         <TabsContent value="live">
           <div className="space-y-3">
             {liveProjects.map(item => <ProjectCard key={item.id} item={item} />)}
-            {liveProjects.length === 0 && (
-              <p className="text-center text-muted-foreground py-12">No live projects yet. Add a project with a Live Link!</p>
-            )}
+            {liveProjects.length === 0 && <p className="text-center text-muted-foreground py-12">No live projects yet.</p>}
           </div>
         </TabsContent>
-
         <TabsContent value="github">
           <div className="space-y-3">
             {githubProjects.map(item => <ProjectCard key={item.id} item={item} />)}
-            {githubProjects.length === 0 && (
-              <p className="text-center text-muted-foreground py-12">No GitHub-only projects yet. Add a project with a GitHub URL!</p>
-            )}
+            {githubProjects.length === 0 && <p className="text-center text-muted-foreground py-12">No GitHub-only projects yet.</p>}
           </div>
         </TabsContent>
       </Tabs>
 
-      {/* Form Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editing ? "Edit Project" : "New Project"}</DialogTitle>
-            <DialogDescription>{editing ? "Update the project details." : "Add a new project to your portfolio."}</DialogDescription>
+            <DialogDescription>{editing ? "Update the project details." : "Add a new project."}</DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
-            {/* Image */}
-            <div>
-              <Label>Image URL</Label>
-              <Input value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} placeholder="https://..." />
-              {form.image_url && (
-                <img src={form.image_url} alt="Preview" className="mt-2 h-24 w-full rounded-lg object-cover" onError={(e) => (e.currentTarget.style.display = "none")} />
-              )}
-            </div>
 
-            {/* Title */}
-            <div>
-              <Label>Title</Label>
-              <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="My Cool Project" />
-            </div>
+          <Tabs defaultValue="info" className="w-full">
+            <TabsList className="w-full">
+              <TabsTrigger value="info" className="flex-1">Info</TabsTrigger>
+              <TabsTrigger value="media" className="flex-1">Image & Tags</TabsTrigger>
+              <TabsTrigger value="links" className="flex-1">Links</TabsTrigger>
+            </TabsList>
 
-            {/* Description */}
-            <div>
-              <Label>Description</Label>
-              <Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3} placeholder="What does this project do?" />
-            </div>
-
-            {/* URLs */}
-            <div>
-              <Label>Project URL (Live Link)</Label>
-              <Input value={form.link} onChange={(e) => setForm({ ...form, link: e.target.value })} placeholder="https://myproject.com" />
-            </div>
-            <div>
-              <Label>GitHub Repository</Label>
-              <Input value={form.github_url} onChange={(e) => setForm({ ...form, github_url: e.target.value })} placeholder="https://github.com/..." />
-            </div>
-
-            {/* Tags */}
-            <div>
-              <Label>Tags</Label>
-              <div className="flex gap-2">
-                <Input
-                  value={tagInput}
-                  onChange={(e) => setTagInput(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addTag(); } }}
-                  placeholder="Type a tag and press Enter"
-                  className="flex-1"
-                />
-                <Button type="button" variant="outline" onClick={addTag} size="sm">Add</Button>
-              </div>
-              {currentTags().length > 0 && (
-                <div className="flex flex-wrap gap-1.5 mt-2">
-                  {currentTags().map((tag) => (
-                    <Badge key={tag} variant="secondary" className="flex items-center gap-1 pr-1">
-                      {tag}
-                      <button onClick={() => removeTag(tag)} className="ml-1 hover:text-destructive">
-                        <X className="h-3 w-3" />
-                      </button>
-                    </Badge>
-                  ))}
+            <TabsContent value="info" className="space-y-4 mt-4">
+              <div><Label>Title</Label><Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="My Cool Project" /></div>
+              <div><Label>Description</Label><Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3} placeholder="What does this project do?" /></div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Status</Label>
+                  <Select value={form.status} onValueChange={(v) => setForm({ ...form, status: v })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="active">Active</SelectItem>
+                      <SelectItem value="archived">Archived</SelectItem>
+                      <SelectItem value="coming_soon">Coming Soon</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
-              )}
-            </div>
-
-            {/* Status & Sort */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label>Status</Label>
-                <Select value={form.status} onValueChange={(v) => setForm({ ...form, status: v })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="archived">Archived</SelectItem>
-                    <SelectItem value="coming_soon">Coming Soon</SelectItem>
-                  </SelectContent>
-                </Select>
+                <div><Label>Sort Order</Label><Input type="number" value={form.sort_order} onChange={(e) => setForm({ ...form, sort_order: parseInt(e.target.value) || 0 })} /></div>
               </div>
-              <div>
-                <Label>Sort Order</Label>
-                <Input type="number" value={form.sort_order} onChange={(e) => setForm({ ...form, sort_order: parseInt(e.target.value) || 0 })} />
+              <div className="flex items-center gap-2">
+                <Switch checked={form.featured} onCheckedChange={(v) => setForm({ ...form, featured: v })} />
+                <Label>Featured Project</Label>
               </div>
-            </div>
+            </TabsContent>
 
-            {/* Featured */}
-            <div className="flex items-center gap-2">
-              <Switch checked={form.featured} onCheckedChange={(v) => setForm({ ...form, featured: v })} />
-              <Label>Featured Project</Label>
-            </div>
+            <TabsContent value="media" className="space-y-4 mt-4">
+              <ImageUploadField
+                label="Project Image"
+                value={form.image_url}
+                onChange={(url) => setForm({ ...form, image_url: url })}
+                onUpload={(file) => upload(file, "projects")}
+                uploading={uploading}
+              />
+              <div>
+                <Label>Tags</Label>
+                <div className="flex gap-2">
+                  <Input
+                    value={tagInput}
+                    onChange={(e) => setTagInput(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addTag(); } }}
+                    placeholder="Type a tag and press Enter"
+                    className="flex-1"
+                  />
+                  <Button type="button" variant="outline" onClick={addTag} size="sm">Add</Button>
+                </div>
+                {currentTags().length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mt-2">
+                    {currentTags().map((tag) => (
+                      <Badge key={tag} variant="secondary" className="flex items-center gap-1 pr-1">
+                        {tag}
+                        <button onClick={() => removeTag(tag)} className="ml-1 hover:text-destructive"><X className="h-3 w-3" /></button>
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </TabsContent>
 
-            <Button onClick={handleSave} className="w-full">{editing ? "Update Project" : "Create Project"}</Button>
-          </div>
+            <TabsContent value="links" className="space-y-4 mt-4">
+              <div><Label>Project URL (Live Link)</Label><Input value={form.link} onChange={(e) => setForm({ ...form, link: e.target.value })} placeholder="https://myproject.com" /></div>
+              <div><Label>GitHub Repository</Label><Input value={form.github_url} onChange={(e) => setForm({ ...form, github_url: e.target.value })} placeholder="https://github.com/..." /></div>
+            </TabsContent>
+          </Tabs>
+
+          <Button onClick={handleSave} className="w-full mt-4">{editing ? "Update Project" : "Create Project"}</Button>
         </DialogContent>
       </Dialog>
     </div>
