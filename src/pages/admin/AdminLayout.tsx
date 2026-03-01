@@ -51,7 +51,7 @@ const AdminLayout = () => {
     <div className="flex min-h-screen">
       {/* Mobile toggle */}
       <button
-        className="fixed bottom-4 right-4 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg md:hidden"
+        className="fixed bottom-4 right-4 z-50 flex h-12 w-12 items-center justify-center rounded bg-primary text-primary-foreground shadow-lg md:hidden"
         onClick={() => setSidebarOpen(!sidebarOpen)}
       >
         {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -77,7 +77,7 @@ const AdminLayout = () => {
                 to={item.to}
                 onClick={() => setSidebarOpen(false)}
                 className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                  "flex items-center gap-3 rounded px-3 py-2.5 text-sm font-medium transition-colors",
                   isActive(item.to, item.exact)
                     ? "bg-primary/10 text-primary"
                     : "text-muted-foreground hover:bg-secondary hover:text-foreground"
@@ -92,7 +92,7 @@ const AdminLayout = () => {
           <div className="border-t border-border p-3">
             <button
               onClick={signOut}
-              className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+              className="flex w-full items-center gap-3 rounded px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
             >
               <LogOut className="h-4 w-4" />
               Sign Out

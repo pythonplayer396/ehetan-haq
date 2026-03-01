@@ -33,18 +33,18 @@ const Login = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-sm rounded-xl border border-border/50 bg-card p-8"
+        className="w-full max-w-sm rounded border border-border bg-card p-8"
       >
         <div className="mb-6 text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-            <Lock className="h-6 w-6 text-primary" />
+          <div className="mx-auto mb-4 flex h-10 w-10 items-center justify-center rounded border border-primary/20 bg-primary/10">
+            <Lock className="h-5 w-5 text-primary" />
           </div>
           <h1 className="text-2xl font-bold text-foreground">Admin Login</h1>
           <p className="mt-1 text-sm text-muted-foreground">Sign in to manage your site</p>
         </div>
 
         {error && (
-          <div className="mb-4 flex items-center gap-2 rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
+          <div className="mb-4 flex items-center gap-2 rounded border border-destructive/20 bg-destructive/10 p-3 text-sm text-destructive">
             <AlertCircle className="h-4 w-4 shrink-0" />
             {error}
           </div>
