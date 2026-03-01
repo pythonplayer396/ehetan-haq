@@ -56,7 +56,7 @@ const Lightbox = ({ src, onClose }: { src: string; onClose: () => void }) => {
         transition={{ duration: 0.3 }}
         src={src}
         alt="Certificate"
-        className="max-h-[85vh] max-w-[90vw] rounded-xl object-contain shadow-2xl"
+        className="max-h-[85vh] max-w-[90vw] rounded object-contain shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       />
     </motion.div>
@@ -131,7 +131,7 @@ const Index = () => {
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
               {techNames.map((tech, i) => (
                 <motion.div key={tech} custom={i} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}
-                  className="group flex items-center gap-3 rounded-xl border border-border/50 bg-card/80 backdrop-blur-sm p-4 transition-all hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
+                  className="group flex items-center gap-3 rounded border border-border/50 bg-card/80 backdrop-blur-sm p-4 transition-all hover:border-primary/30">
                   <TechIcon name={tech} className="h-8 w-8 transition-transform group-hover:scale-110" />
                   <span className="text-sm font-medium text-foreground">{tech}</span>
                 </motion.div>
@@ -158,14 +158,14 @@ const Index = () => {
 
                 return (
                   <motion.div key={project.id} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1, duration: 0.6 }}>
-                    <Wrapper {...(wrapperProps as any)} className="group block rounded-xl border border-border/50 bg-card/80 backdrop-blur-sm p-6 transition-all hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 h-full">
+                    <Wrapper {...(wrapperProps as any)} className="group block rounded border border-border/50 bg-card/80 backdrop-blur-sm p-6 transition-all hover:border-primary/30 h-full">
                       <div className="mb-4 flex items-start justify-between">
                         {project.image_url ? (
-                          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 overflow-hidden">
+                          <div className="flex h-12 w-12 items-center justify-center rounded bg-primary/10 overflow-hidden">
                             <img src={project.image_url} alt={project.title} className="h-8 w-8 object-contain" />
                           </div>
                         ) : (
-                          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
+                          <div className="flex h-12 w-12 items-center justify-center rounded bg-primary/10">
                             <span className="text-lg font-bold text-primary">{project.title[0]}</span>
                           </div>
                         )}
@@ -210,7 +210,7 @@ const Index = () => {
                     viewport={{ once: true }}
                     transition={{ delay: i * 0.1, duration: 0.6 }}
                   >
-                    <div className="group rounded-xl border border-border/50 bg-card/80 backdrop-blur-sm overflow-hidden transition-all hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 h-full flex flex-col cursor-pointer" onClick={() => cert.image_url && setLightboxImg(cert.image_url)}>
+                    <div className="group rounded border border-border/50 bg-card/80 backdrop-blur-sm overflow-hidden transition-all hover:border-primary/30 h-full flex flex-col cursor-pointer" onClick={() => cert.image_url && setLightboxImg(cert.image_url)}>
                       {cert.image_url ? (
                         <div className="relative aspect-[16/10] overflow-hidden">
                           <img

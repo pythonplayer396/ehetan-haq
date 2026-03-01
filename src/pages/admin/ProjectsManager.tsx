@@ -98,12 +98,12 @@ const ProjectsManager = () => {
   const githubProjects = items.filter(i => !i.link && i.github_url && (!search || i.title.toLowerCase().includes(search.toLowerCase())));
 
   const ProjectCard = ({ item }: { item: any }) => (
-    <div className="rounded-xl border border-border bg-card p-4">
+    <div className="rounded border border-border bg-card p-4">
       <div className="flex gap-4">
         {item.image_url ? (
-          <img src={item.image_url} alt={item.title} className="h-16 w-16 sm:h-20 sm:w-20 rounded-lg object-cover flex-shrink-0" />
+          <img src={item.image_url} alt={item.title} className="h-16 w-16 sm:h-20 sm:w-20 rounded object-cover flex-shrink-0" />
         ) : (
-          <div className="flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-lg bg-primary/10 text-2xl font-bold text-primary flex-shrink-0">
+          <div className="flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded bg-primary/10 text-2xl font-bold text-primary flex-shrink-0">
             {item.title[0]}
           </div>
         )}
@@ -113,7 +113,7 @@ const ProjectsManager = () => {
               <div className="flex items-center gap-2 flex-wrap">
                 <h3 className="font-semibold text-foreground truncate">{item.title}</h3>
                 {item.featured && <Star className="h-4 w-4 text-yellow-500 fill-yellow-500 shrink-0" />}
-                <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold shrink-0 ${
+                <span className={`inline-flex items-center rounded px-2 py-0.5 text-xs font-semibold shrink-0 ${
                   item.status === "active" ? "bg-green-500/15 text-green-600" : item.status === "coming_soon" ? "bg-yellow-500/15 text-yellow-600" : "bg-muted text-muted-foreground"
                 }`}>{item.status}</span>
               </div>

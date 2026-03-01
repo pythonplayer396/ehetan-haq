@@ -87,12 +87,12 @@ const ServicesManager = () => {
   const filtered = items.filter(i => !search || i.title.toLowerCase().includes(search.toLowerCase()));
 
   const ServiceCard = ({ item }: { item: any }) => (
-    <div className="rounded-xl border border-border bg-card p-4">
+    <div className="rounded border border-border bg-card p-4">
       <div className="flex gap-4">
         {item.icon_url ? (
-          <img src={item.icon_url} alt={item.title} className="h-16 w-16 sm:h-20 sm:w-20 rounded-lg object-cover flex-shrink-0" />
+          <img src={item.icon_url} alt={item.title} className="h-16 w-16 sm:h-20 sm:w-20 rounded object-cover flex-shrink-0" />
         ) : (
-          <div className="flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-lg bg-primary/10 text-2xl font-bold text-primary flex-shrink-0">
+          <div className="flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded bg-primary/10 text-2xl font-bold text-primary flex-shrink-0">
             {item.title[0]}
           </div>
         )}
@@ -101,7 +101,7 @@ const ServicesManager = () => {
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <h3 className="font-semibold text-foreground truncate">{item.title}</h3>
-                <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold shrink-0 ${item.active ? "bg-green-500/15 text-green-600" : "bg-muted text-muted-foreground"}`}>
+                <span className={`inline-flex items-center rounded px-2 py-0.5 text-xs font-semibold shrink-0 ${item.active ? "bg-green-500/15 text-green-600" : "bg-muted text-muted-foreground"}`}>
                   {item.active ? "Active" : "Inactive"}
                 </span>
               </div>
